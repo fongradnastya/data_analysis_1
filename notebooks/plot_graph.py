@@ -1,65 +1,71 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def build_category_graf(data_f, column, column_name):
-    """
 
+def build_category_graf(data_f, column):
+    """
+    Строит набор графиков для категориального признака
     :param data_f:
     :param column:
-    :param column_name:
     :return:
     """
     n_data = data_f[column].value_counts()
-    fig = plt.figure(figsize=(15, 5))
+    fig = plt.figure(figsize=(20, 10))
     # Adds subplot on position 1
     ax = fig.add_subplot(121)
     # Adds subplot on position 2
     ax2 = fig.add_subplot(122)
     ax.pie(n_data.values, labels=n_data.index)
     ax.legend(bbox_to_anchor=(0.9, 1))
-    ax.set_title(f"Круговая диаграмма {column_name}")
+    ax.set_title(f"Круговая диаграмма {column}")
     ax2.bar(x=n_data.index, height=n_data.values)
-    ax2.set_title(f"Столбчатая диаграмма {column_name}")
+    ax2.set_title(f"Столбчатая диаграмма {column}")
     plt.setp([ax2], xlabel='значения выборки', ylabel='частота')
+    ax2.tick_params(labelrotation=330)
     plt.show()
 
 
-def build_numeric_graph(data_f, column, column_name):
-    # n_bins = len(num1)
+def build_numeric_graph(data_f, column):
+    """
+    Строит набор графиков для числового признака
+    :param data_f: исходный фрейм данных
+    :param column: название колонки
+    """
     num = data_f[column].dropna()
     fig = plt.figure(figsize=(17, 5))
     ax = fig.add_subplot(131)
     ax2 = fig.add_subplot(133)
     ax3 = fig.add_subplot(132)
-    ax.hist(num)
-    ax.set_title(f"Гистограмма {column_name}")
-    ax2.boxplot(x=num, data=data_f)
-    ax3.set_title(f"Оценка функции плотности {column_name}")
-    ax2.set_title(f"Диаграмма 'ящик с усами' {column_name}")
-    num.plot.kde()
+    ax.set_title(f"Гистограмма {column}")
+    ax3.set_title(f"Оценка функции плотности {column}")
+    ax2.set_title(f"Диаграмма 'ящик с усами' {column}")
     plt.setp([ax, ax3], xlabel='значения выборки')
-    plt.setp([ax2], xlabel='номер выборки', ylabel='разброс значений')
+    plt.setp([ax2], ylabel='номер выборки', xlabel='разброс значений')
     plt.setp([ax], ylabel='частота')
     plt.setp([ax3], ylabel='вероятность')
-    plt.show()
+    try:
+        ax.hist(num, bins=50)
+        ax2.boxplot(x=num, data=data_f, vert=False)
+        num.plot.kde()
+        plt.show()
+    except TypeError:
+        print("График не может быть построен, т.к."
+              " содержит некорректные значения")
 
 
-def build_three_hists(data_f, column1, column2, column3):
+def build_three_hists(data_f, columns):
     """
-
-    :param data_f:
-    :param column1:
-    :param column2:
-    :param column3:
-    :return:
+    Строит гистограммы для трёх числовых параметров
+    :param data_f: исходный фрейм с данными
+    :param columns:
     """
     fig = plt.figure(figsize=(17, 5))
     ax = fig.add_subplot(131)
     ax2 = fig.add_subplot(133)
     ax3 = fig.add_subplot(132)
-    ax.hist(data_f[column1])
-    ax2.hist(data_f[column2])
-    ax3.hist(data_f[column3])
+    ax.hist(data_f[columns[0]])
+    ax2.hist(data_f[columns[1]])
+    ax3.hist(data_f[columns[2]])
     ax.set_title("Гистограмма 1 числового параметра")
     ax3.set_title("Гистограмма 2 числового параметра")
     ax2.set_title("Гистограмма 3 числового параметра")
@@ -69,12 +75,12 @@ def build_three_hists(data_f, column1, column2, column3):
 
 def compare_category_graf(data_1, data_2, column_1, column_2, column_name):
     """
-
-    :param data_1:
-    :param data_2:
-    :param column_1:
-    :param column_2:
-    :param column_name:
+    Сопоставляет графики двух категориальных признаков
+    :param data_1: первый фрейм данных
+    :param data_2: второй фрейм данных
+    :param column_1: столбец первого фрейма
+    :param column_2: столбец второго фрейма
+    :param column_name: название сопоставляемых
     :return:
     """
     n_data_1 = data_1[column_1].value_counts()
@@ -103,13 +109,12 @@ def compare_category_graf(data_1, data_2, column_1, column_2, column_name):
 
 def compare_numeric_graph(data_1, data_2, column_1, column_2, column_name):
     """
-
-    :param data_1:
-    :param data_2:
-    :param column_1:
-    :param column_2:
-    :param column_name:
-    :return:
+    Сопоставляет графики двух числовых признаков
+    :param data_1: первый фрейм данных
+    :param data_2: второй фрейм данных
+    :param column_1: столбец первого фрейма
+    :param column_2: столбец второго фрейма
+    :param column_name: название сравниваемого параметра
     """
     num_1 = data_1[column_1].dropna()
     num_2 = data_2[column_2]

@@ -1,3 +1,6 @@
 pandas~=1.5.2
 matplotlib~=3.6.2
 numpy~=1.23.5
+sklearn
+seaborn~=0.12.2
+scipy
