@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from scipy.stats import sigmaclip
 import seaborn as sns
 
 
@@ -107,3 +108,37 @@ def compare_category_graf(data_1, data_2, column_1, column_2):
     ax4.tick_params(labelrotation=330)
     plt.setp([ax2], xlabel='значения выборки', ylabel='частота')
     plt.show()
+
+
+def quantile_method(data_frame, column):
+    """
+    Удаляет пропуски методом квантилей
+    :param data_frame: исходный фрейм данных
+    :param column: название колонки для вычисления
+    :return: обновлённый фрейм данных
+    """
+    q25 = data_frame[column].quantile(0.25)
+    q75 = data_frame[column].quantile(0.75)
+    delta = q75 - q25
+    low, high = [(q25 - 1.5 * delta), (q75 + 1.5 * delta)]
+    dropped_values = data_frame[column][(data_frame[column] < low) |
+                                        (data_frame[column] > high)]
+    data_frame = data_frame.drop(dropped_values.index)
+    return data_frame
+
+
+def sigma_method(data_frame, column):
+    """
+    Удаляет пропуски методом сигм
+    :param data_frame: фрейм данных
+    :param column: название колонки фрейма
+    :return: обновлённый фрейм данных
+    """
+    data = data_frame.dropna()
+    _, low, high = sigmaclip(data[column], 3, 3)
+    # c < mean(c) - std(c)*low c > mean(c) + std(c)*high
+    # (std - стандартное отклонение)
+    dropped_values = data_frame[column][(data_frame[column] < low) |
+                                         (data_frame[column] > high)]
+    data_frame = data_frame.drop(dropped_values.index)
+    return data_frame
